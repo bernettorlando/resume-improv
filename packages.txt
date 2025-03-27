@@ -1,0 +1,6 @@
+# packages.txt
+texlive-latex-base
+texlive-latex-recommended
+texlive-fonts-recommended
+lmodern
+texlive-latex-extra 
