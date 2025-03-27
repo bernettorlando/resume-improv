@@ -47,7 +47,8 @@ output_area = st.empty() # Placeholder for the output
 
 # Display stored LaTeX code if it exists
 if st.session_state.improved_tex_code:
-    output_area.code(st.session_state.improved_tex_code, language='latex')
+    with st.expander("📝 View Generated LaTeX Code", expanded=False):
+        st.code(st.session_state.improved_tex_code, language='latex')
     st.success("✅ Improved LaTeX code generated successfully!")
     
     # Display download button if PDF exists
@@ -184,7 +185,8 @@ if submit_button:
                         st.session_state.pdf_bytes = pdf_bytes
                         
                         # Display the results
-                        output_area.code(improved_tex_code, language='latex')
+                        with st.expander("📝 View Generated LaTeX Code", expanded=False):
+                            st.code(improved_tex_code, language='latex')
                         st.success("✅ Improved LaTeX code generated successfully!")
                         st.toast("Generation Complete!", icon="🎉")
                         
