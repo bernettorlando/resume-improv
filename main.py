@@ -6,6 +6,9 @@ import time
 import tempfile
 import subprocess
 import shutil
+import base64
+import fitz # PyMuPDF for image preview
+import io   # For handling image bytes
 # Import Google API exceptions
 from google.api_core import exceptions as google_exceptions
 
@@ -126,15 +129,38 @@ if st.session_state.get('improved_tex_code'): # Use .get for safety
         with st.expander("📊 Summary of Changes", expanded=True):
              st.markdown(st.session_state.change_summary)
 
-    # Display download button if PDF exists
+    # Display PDF preview and download button if PDF exists
     if st.session_state.get('pdf_bytes'):
+        st.success("✅ PDF generated successfully!")
+
+        # --- PDF Preview Expander ---
+        with st.expander("📄 Preview Generated PDF (All Pages)", expanded=False):
+            try:
+                pdf_doc = fitz.open(stream=st.session_state.pdf_bytes, filetype="pdf")
+                if pdf_doc.page_count > 0:
+                    for page_num in range(pdf_doc.page_count):
+                        # Render the current page
+                        page = pdf_doc.load_page(page_num)
+                        # Increase DPI for better quality
+                        pix = page.get_pixmap(dpi=300)
+                        img_bytes = pix.tobytes("png") # Convert pixmap to PNG bytes
+                        # Display the image
+                        st.image(io.BytesIO(img_bytes),
+                                 caption=f"Page {page_num + 1} of {pdf_doc.page_count}",
+                                 use_container_width=True)
+                else:
+                    st.warning("PDF is empty, cannot generate preview.")
+                pdf_doc.close()
+            except Exception as e:
+                st.error(f"Error generating PDF preview: {e}")
+
+        # --- Download Button ---
         st.download_button(
             label="📥 Download PDF",
             data=st.session_state.pdf_bytes,
             file_name="improved_resume.pdf",
             mime="application/pdf"
         )
-        st.success("✅ PDF generated successfully!")
 
 # --- Logic ---
 if submit_button:
@@ -334,7 +360,29 @@ if submit_button:
                         summary_area.empty() # Clear placeholder if successful
 
                         st.toast("Generation Complete!", icon="🎉")
-                        
+
+                        # --- PDF Preview Expander (Success Case) ---
+                        st.success("✅ PDF generated successfully!")
+                        with st.expander("📄 Preview Generated PDF (All Pages)", expanded=False):
+                            try:
+                                pdf_doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+                                if pdf_doc.page_count > 0:
+                                    for page_num in range(pdf_doc.page_count):
+                                        # Render the current page
+                                        page = pdf_doc.load_page(page_num)
+                                        # Increase DPI for better quality
+                                        pix = page.get_pixmap(dpi=300)
+                                        img_bytes = pix.tobytes("png") # Convert pixmap to PNG bytes
+                                        # Display the image
+                                        st.image(io.BytesIO(img_bytes),
+                                                 caption=f"Page {page_num + 1} of {pdf_doc.page_count}",
+                                                 use_container_width=True)
+                                else:
+                                    st.warning("PDF is empty, cannot generate preview.")
+                                pdf_doc.close()
+                            except Exception as e:
+                                st.error(f"Error generating PDF preview: {e}")
+
                         # Create download button
                         st.download_button(
                             label="📥 Download PDF",
@@ -342,9 +390,6 @@ if submit_button:
                             file_name="improved_resume.pdf",
                             mime="application/pdf"
                         )
-                        st.success("✅ PDF generated successfully!")
-                        
-                        # Break the retry loop on successful LaTeX compilation
                         api_key_valid = True # Key worked for this generation
                         break # Exit the while loop for retries
                     else:
