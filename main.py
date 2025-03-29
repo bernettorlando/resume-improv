@@ -23,6 +23,10 @@ if 'api_source' not in st.session_state: # 'env', 'user', None
     st.session_state.api_source = None
 if 'show_api_input' not in st.session_state:
     st.session_state.show_api_input = False
+if 'change_summary' not in st.session_state:
+    st.session_state.change_summary = None
+if 'request_summary' not in st.session_state: # Track checkbox state
+    st.session_state.request_summary = False
 
 # --- Configuration ---
 st.set_page_config(page_title="Resume Improver with Gemini", layout="wide")
@@ -87,6 +91,10 @@ with col2:
         key="job_desc_input"
     )
 
+# --- Options --- (Moved checkbox here)
+st.subheader("Options")
+st.session_state.request_summary = st.checkbox("Include summary of changes?", value=st.session_state.request_summary, key="summary_checkbox")
+
 # --- Processing Button ---
 st.divider()
 submit_button = st.button("🚀 Generate Improved Resume LaTeX")
@@ -94,6 +102,7 @@ submit_button = st.button("🚀 Generate Improved Resume LaTeX")
 # --- Output Area ---
 st.subheader("✨ Generated Improved LaTeX Code ✨")
 output_area = st.empty() # Placeholder for the output
+summary_area = st.empty() # Placeholder for the summary
 
 # Clear previous output when generate button is clicked
 if submit_button:
@@ -101,17 +110,24 @@ if submit_button:
     st.session_state.improved_tex_code = None
     st.session_state.pdf_bytes = None
     st.session_state.retry_count = 0
-    # Clear output area
+    st.session_state.change_summary = None # Clear summary
+    # Clear output areas
     output_area.empty()
+    summary_area.empty()
 
-# Display stored LaTeX code if it exists
-if st.session_state.improved_tex_code:
+# Display stored LaTeX code and summary if they exist
+if st.session_state.get('improved_tex_code'): # Use .get for safety
     with st.expander("📝 View Generated LaTeX Code", expanded=False):
         st.code(st.session_state.improved_tex_code, language='latex')
     st.success("✅ Improved LaTeX code generated successfully!")
-    
+
+    # Display the summary ONLY if it exists (i.e., was requested and generated)
+    if st.session_state.get('change_summary'):
+        with st.expander("📊 Summary of Changes", expanded=True):
+             st.markdown(st.session_state.change_summary)
+
     # Display download button if PDF exists
-    if st.session_state.pdf_bytes:
+    if st.session_state.get('pdf_bytes'):
         st.download_button(
             label="📥 Download PDF",
             data=st.session_state.pdf_bytes,
@@ -143,6 +159,9 @@ if submit_button:
 
     # Flag to check if API key needs verification/change
     api_key_valid = True
+
+    # Get the checkbox state at the time of submission
+    summary_requested = st.session_state.request_summary
 
     while st.session_state.retry_count < 3:  # Maximum 3 retries for LaTeX compilation
         try:
@@ -183,7 +202,7 @@ if submit_button:
             # --- Prepare for Gemini API Call ---
             model = genai.GenerativeModel('gemini-2.5-pro-exp-03-25')
 
-            # --- Construct the Prompt ---
+            # --- Construct the Prompt --- (Conditionally add summary instructions)
             prompt_parts = [
                 "You are an expert LaTeX resume editor specializing in ATS-friendly resumes tailored for specific job descriptions.",
                 "You will be given the current LaTeX code for a resume, a PDF file with improvement feedback, and potentially a target job description.",
@@ -195,7 +214,7 @@ if submit_button:
                 uploaded_gemini_file,
             ]
 
-            # Conditionally add Job Description to the prompt
+            # Conditionally add Job Description
             if job_description:
                 prompt_parts.extend([
                     "\n**Target Job Description:**\n```text\n",
@@ -203,40 +222,71 @@ if submit_button:
                     "\n```\n",
                 ])
 
-            # Add Output and Formatting Requirements
-            prompt_parts.extend([
+            # Define Output Requirements based on checkbox
+            output_reqs = [
                 "\n**Output Requirements:**",
                 "- Output ONLY the complete, modified LaTeX code for the improved resume.",
-                "- Ensure the output is valid LaTeX that can be compiled directly.",
-                "- Incorporate feedback from the PDF and tailor content/keywords to the job description (if provided).",
+                "- Ensure the LaTeX output is valid and compilable.",
+                "- Incorporate feedback from the PDF and tailor content/keywords to the job description.",
                 "- Do NOT include any conversational text, explanations, or introductions/conclusions outside the LaTeX code itself.",
                 "- Use comments within LaTeX (e.g., `% Gemini: Applied suggestion X / Tailored for JD keyword Y`) if helpful.",
+            ]
+            if summary_requested:
+                output_reqs.insert(2, "1a. After the LaTeX code block, add a separator line exactly like this: `--- SUMMARY ---`")
+                output_reqs.insert(3, "1b. After the separator, provide a brief bulleted list summarizing the key changes made based on the feedback PDF and job description (if provided). Mention specific keywords tailored if applicable.")
+                # Adjust numbering/phrasing if needed, but main point is conditional inclusion
+                output_reqs[-2] = "- Do NOT include any conversational text, explanations, or introductions/conclusions outside the LaTeX code itself OR the summary section."
+
+            formatting_reqs = [
                 "\n**Formatting Requirements:**",
                 "- Maintain ATS compatibility (standard commands, avoid complex formatting).",
                 "- Ensure excellent readability with appropriate vertical spacing (`\\vspace`, `\\itemsep`, etc.).",
                 "- Use standard fonts and maintain clear document hierarchy.",
-            ])
+            ]
 
-            # Add error context if this is a retry
+            prompt_parts.extend(output_reqs)
+            prompt_parts.extend(formatting_reqs)
+
+            # Add error context if this is a retry (Conditionally mention summary)
             if st.session_state.retry_count > 0:
-                prompt_parts.extend([
+                error_prompt_addition = [
                     "\n**Previous Attempt Error:**",
                     "The previous LaTeX code failed to compile. Here are the error logs:",
                     "```text",
                     st.session_state.last_error,
                     "```",
-                    "\nPlease fix the LaTeX code to address these compilation errors while still considering the feedback PDF and job description.",
-                ])
+                ]
+                if summary_requested:
+                    error_prompt_addition[-1] += " Remember to output the corrected LaTeX code followed by `--- SUMMARY ---` and a summary of changes."
+                prompt_parts.extend(error_prompt_addition)
 
-            output_area.info(f"Attempt {st.session_state.retry_count + 1}: Generating improved LaTeX code...")
+            output_area.info(f"Attempt {st.session_state.retry_count + 1}: Generating improved LaTeX code{' and summary' if summary_requested else ''}...")
             with st.spinner("🧠 Gemini is thinking..."):
-                # --- Call Gemini API ---
                 response = model.generate_content(prompt_parts, stream=False)
 
-            # --- Process Response ---
+            # --- Process Response --- (Updated for conditional summary)
             if response and response.text:
-                improved_tex_code = response.text
-                # Clean potential markdown code block formatting
+                full_response_text = response.text
+                separator = "--- SUMMARY ---"
+                change_summary = None # Default to no summary
+                improved_tex_code = full_response_text # Assume full response is LaTeX initially
+
+                if summary_requested:
+                    if separator in full_response_text:
+                        parts = full_response_text.split(separator, 1)
+                        improved_tex_code = parts[0].strip()
+                        change_summary = parts[1].strip()
+                    else:
+                        # Summary was requested but separator not found
+                        st.warning("⚠️ Summary was requested, but Gemini did not provide a summary separator. Displaying full response as LaTeX.")
+                        # Keep improved_tex_code as the full response
+                        change_summary = None # Ensure summary is None
+                else:
+                    # Summary was not requested, ensure change_summary is None
+                    change_summary = None
+                    # improved_tex_code is already the full response
+
+                # Clean potential markdown code block formatting from LaTeX part
                 if improved_tex_code.startswith("```latex"):
                      improved_tex_code = improved_tex_code[len("```latex"):].strip()
                 if improved_tex_code.endswith("```"):
@@ -267,14 +317,22 @@ if submit_button:
                         with open(pdf_file_path, "rb") as pdf_file:
                             pdf_bytes = pdf_file.read()
                         
-                        # Store the improved LaTeX code and PDF in session state
+                        # Store results in session state (conditionally includes summary)
                         st.session_state.improved_tex_code = improved_tex_code
                         st.session_state.pdf_bytes = pdf_bytes
+                        st.session_state.change_summary = change_summary # Store None if no summary
                         
                         # Display the results
                         with st.expander("📝 View Generated LaTeX Code", expanded=False):
                             st.code(improved_tex_code, language='latex')
                         st.success("✅ Improved LaTeX code generated successfully!")
+
+                        # Display the summary
+                        if st.session_state.get('change_summary'):
+                            with st.expander("📊 Summary of Changes", expanded=True):
+                                 st.markdown(st.session_state.change_summary)
+                        summary_area.empty() # Clear placeholder if successful
+
                         st.toast("Generation Complete!", icon="🎉")
                         
                         # Create download button
