@@ -80,6 +80,13 @@ with col2:
     st.subheader("2. Upload Instructions PDF")
     uploaded_pdf = st.file_uploader("Upload PDF report with improvement suggestions:", type="pdf", key="pdf_upload")
 
+    st.subheader("3. (Optional) Paste Job Description")
+    job_description = st.text_area(
+        "Paste the target job description here for tailored improvements:",
+        height=200,
+        key="job_desc_input"
+    )
+
 # --- Processing Button ---
 st.divider()
 submit_button = st.button("🚀 Generate Improved Resume LaTeX")
@@ -174,25 +181,41 @@ if submit_button:
                     st.stop() # Stop if PDF upload fails critically
 
             # --- Prepare for Gemini API Call ---
-            model = genai.GenerativeModel('gemini-2.5-pro-exp-03-25') # Consider making model instantiation outside loop if safe
+            model = genai.GenerativeModel('gemini-2.5-pro-exp-03-25')
 
             # --- Construct the Prompt ---
             prompt_parts = [
-                "You are an expert LaTeX resume editor.",
-                "You will be given the current LaTeX code for a resume and a PDF file containing instructions, feedback, or suggestions for improving that resume.",
-                "\n**Task:** Analyze the instructions in the provided PDF file and apply them to the given LaTeX code to generate a new, complete, and improved version of the resume's LaTeX code.",
+                "You are an expert LaTeX resume editor specializing in ATS-friendly resumes tailored for specific job descriptions.",
+                "You will be given the current LaTeX code for a resume, a PDF file with improvement feedback, and potentially a target job description.",
+                "\n**Task:** Analyze the instructions in the PDF and the requirements in the job description (if provided). Apply relevant improvements to the given LaTeX code to create an optimized, ATS-friendly version tailored for the target role.",
                 "\n**Input Resume LaTeX Code:**\n```latex\n",
                 current_tex_code,
                 "\n```\n",
                 "\n**Input Instructions PDF:**\n",
                 uploaded_gemini_file,
+            ]
+
+            # Conditionally add Job Description to the prompt
+            if job_description:
+                prompt_parts.extend([
+                    "\n**Target Job Description:**\n```text\n",
+                    job_description,
+                    "\n```\n",
+                ])
+
+            # Add Output and Formatting Requirements
+            prompt_parts.extend([
                 "\n**Output Requirements:**",
                 "- Output ONLY the complete, modified LaTeX code for the improved resume.",
                 "- Ensure the output is valid LaTeX that can be compiled directly.",
-                "- Do NOT include any conversational text, explanations, or introductions/conclusions outside of the LaTeX code itself.",
-                "- You may add comments within the LaTeX code (e.g., `% Gemini: Applied suggestion X from PDF`) if helpful, but the primary output must be the code.",
-                "- Base your modifications strictly on the instructions found within the PDF document.",
-            ]
+                "- Incorporate feedback from the PDF and tailor content/keywords to the job description (if provided).",
+                "- Do NOT include any conversational text, explanations, or introductions/conclusions outside the LaTeX code itself.",
+                "- Use comments within LaTeX (e.g., `% Gemini: Applied suggestion X / Tailored for JD keyword Y`) if helpful.",
+                "\n**Formatting Requirements:**",
+                "- Maintain ATS compatibility (standard commands, avoid complex formatting).",
+                "- Ensure excellent readability with appropriate vertical spacing (`\\vspace`, `\\itemsep`, etc.).",
+                "- Use standard fonts and maintain clear document hierarchy.",
+            ])
 
             # Add error context if this is a retry
             if st.session_state.retry_count > 0:
@@ -202,7 +225,7 @@ if submit_button:
                     "```text",
                     st.session_state.last_error,
                     "```",
-                    "\nPlease fix the LaTeX code to address these compilation errors.",
+                    "\nPlease fix the LaTeX code to address these compilation errors while still considering the feedback PDF and job description.",
                 ])
 
             output_area.info(f"Attempt {st.session_state.retry_count + 1}: Generating improved LaTeX code...")
