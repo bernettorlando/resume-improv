@@ -1,0 +1,589 @@
+
+
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-0.7in}  % Increased top margin adjustment
+\addtolength{\textheight}{1.2in} % Increased text height adjustment
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[3]{
+  \vspace{-1pt} % Reduced vertical space before subheadings
+  \item
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} \small{#2} & #3 \\
+    \end{tabular*}\vspace{-5pt} % Reduced vertical space after subheadings
+}
+
+\newcommand{\resumeSubSubheadingExp}[2]{
+  \vspace{-8pt} % Reduced vertical space
+  \item
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \small{#2} \\
+    \end{tabular*}\vspace{-2pt} % Reduced vertical space
+}
+
+% Newly added for EDUCATION
+\newcommand{\educationHeading}[4]{
+  \vspace{-1pt}\item %Reduced vertical space
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-5pt} %Reduced vertical space
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{1.0\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-5pt} % Reduced vertical space
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.00in, label={}, itemsep=-0.5ex]} % Reduced item separation
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize} [leftmargin=0.1in, itemsep=-0.5ex]} % Reduced item separation
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-4pt}} % Reduced vertical space
+
+% Adjusting Margins
+\usepackage{geometry}
+\geometry{left=0.45in, right=0.45in, top=0.4in, bottom=0.4in}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\begin{center}
+    \textbf{\Large \scshape Jenifer Seciliya} \\ \vspace{1pt}
+    \small Data Analyst $|$ California, USA \\ 
+    \small +1 484-681-3442 $|$ \href{mailto:ceciliajenifer@gmail.com}{\underline{ceciliajenifer@gmail.com}} $|$ \href{https://www.linkedin.com/in/jenifercecilia0808/} {\underline{Linkedin}}
+\end{center}
+\vspace{-18pt} %Reduced
+%------Summary of Qualification ------
+
+\section{Summary}
+A Data Analyst and Data Scientist with a strong background in analyzing and interpreting data to support business decisions. Experienced in using Python, SQL, and machine learning techniques to analyze data, build predictive models, and create clear visualizations. Proficient in leveraging tools such as Tableau, Power BI, and Python libraries (Matplotlib, Seaborn) to present data in an accessible and meaningful way. Skilled in data cleaning and transformation, and applying machine learning algorithms to uncover patterns and generate accurate predictions. Focused on utilizing data to solve complex problems, optimize processes, and enable informed decision-making. Eager to contribute to customer-facing data science and data analytics projects and enhance platform functionality.
+\vspace{-5pt}
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \educationHeading
+      {Harrisburg University of Science and Technology, Pennsylvania}{Mar 2023 - Feb 2025}
+      {Masters of Science in Data Science} {GPA: 3.76/4.0}
+       \vspace{2pt}
+      \resumeItemListStart
+        \resumeItem{\textbf{Relevant Coursework:} Advanced Programming (Python), Exploratory Data Analysis, NLP, Machine Learning, Digital Marketing Analytics, Research Methodology.}
+      \resumeItemListEnd}
+    \vspace{4pt} % Add space here
+
+    \educationHeading
+      {St. Xavier’s Catholic College of Engineering, India}{Aug 2014 - May 2018}
+      {Bachelor of Engineering, Computer Science}{}
+  \resumeSubHeadingListEnd
+
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+    \vspace{4pt}
+
+   \resumeSubheading
+      {Verizon-Best Wireless}{}{New York, USA}
+      \resumeSubSubheadingExp
+     {Data Analyst}{Mar 2024 - Feb 2025}
+      \resumeItemListStart
+        
+        \resumeItem{Analyzed sales and chargeback data to provide meaningful insights and improve business performance.}
+
+        \resumeItem{Created interactive Power BI dashboards and automated reports, helping district managers track key sales metrics in real time.}
+
+        \resumeItem{Wrote complex SQL queries to extract and clean large datasets, ensuring accurate and reliable reporting.}
+
+        \resumeItem{Used Python (Matplotlib, Pandas, Seaborn) to visualize trends, uncover patterns, and present findings to stakeholders in an easy-to-understand format.}
+
+        \resumeItem{Identified chargeback trends, leading to a 10\% reduction in operational inefficiencies by improving dispute resolution strategies.}
+
+       \resumeItem{Collaborated with finance and operations teams to refine reporting processes, enhancing decision-making.}
+
+       \resumeItem{Ensured data integrity and quality checks, minimizing reporting errors and increasing trust in analytics.}
+    \resumeItemListEnd
+   \vspace{4pt}
+
+    \resumeSubheading
+      {Convergence}{}{Hyderabad, India}
+      \resumeSubSubheadingExp
+     {Data Analyst}{Aug 2021 - Dec 2022}
+      \resumeItemListStart
+        \resumeItem{Developed interactive data visualizations, dashboards, and reports using \textbf{Tableau} and \textbf{Power BI}, transforming complex financial data from relational databases, Excel, and CSV files into actionable insights.}
+        \resumeItem{Performed \textbf{data cleaning, standardization, and segmentation} to improve data quality and ensure accurate analysis using \textbf{SQL} and data manipulation techniques.}
+        \resumeItem{Automated recurring financial reports, reducing manual effort and improving reporting efficiency by \textbf{30\%}.}
+        \resumeItem{Identified financial trends and anomalies, helping optimize revenue and cost-saving strategies.}
+        \resumeItem{Collaborated with finance teams to enhance \textbf{forecasting models}, improving budget accuracy and financial planning.}
+    \resumeItemListEnd
+    \resumeItemListEnd
+    \vspace{4pt}
+
+     \resumeSubheading
+      {Pantech solution}{}{Remote, India}
+      \resumeSubSubheadingExp{Artificial Intelligence Engineer Intern}{May 2021 - Jul 2021}
+      \resumeItemListStart
+         \resumeItem{Worked on developing and implementing computer vision models for tasks like face, fingerprint, and object detection, including face mask detection, using Python, OpenCV, TensorFlow, and PyTorch.}
+        \resumeItem{Processed and prepared images by applying feature extraction, data augmentation, and preprocessing techniques to enhance model accuracy and efficiency.}
+        \resumeItem{Utilized SQL to extract and manipulate structured data, ensuring seamless integration of computer vision insights into business intelligence reports and analytics.}
+        \resumeItem{Improved model performance by fine-tuning deep learning models through hyperparameter tuning and optimizing pre-trained architectures like ResNet, YOLO, and MobileNet.}
+    \resumeItemListEnd}
+     \vspace{4pt}
+
+      \resumeSubheading
+      {Flux Auto}{}{Bangalore, India}
+      \resumeProjectHeading {\textbf{Data Scientist} \textbf{}}{Sep 2019 -  Apr 2020}
+        \resumeItemListStart
+            \resumeItem{Focused on data annotation and quality control for computer vision projects, ensuring accurate data for training and testing models.}
+        \resumeItem{Developed and applied object detection and segmentation models using Python, TensorFlow, PyTorch, and OpenCV, improving accuracy by 30\% in detecting objects.}
+        \resumeItem{Created and improved deep learning systems for autonomous vehicles, using models like YOLO, Faster R-CNN, and Mask R-CNN.}
+        \resumeItem{Processed and enhanced data through preprocessing, augmentation, and feature engineering to improve model performance.}
+        \resumeItem{As a team leader, managed a group of data scientist interns, ensuring the smooth development and deployment of object detection models for autonomous driving, while keeping the project on track and ensuring the models worked well.}
+           \resumeItemListEnd}
+           \vspace{1.5pt}
+
+
+  \resumeSubHeadingListEnd
+
+
+%-----------PROJECTS-----------
+\vspace{-8pt}
+\section{Projects}
+    \resumeSubHeadingListStart
+       \resumeProjectHeading
+          {\textbf{Social Media and Mental Health Analysis (EDA, Python, SQL)}}{Oct 2024 - Feb 2025}
+          \resumeItemListStart
+
+            \resumeItem{Conducted exploratory data analysis (EDA) and built predictive models in Python to analyze the impact of social media on mental health outcomes such as anxiety and depression.}
+             \resumeItem{Used machine learning algorithms (Random Forest, SVM) to build predictive models assessing the relationship between social media usage patterns and mental well-being.}
+             \resumeItem{Visualized the impact of social media on mental health findings using matplotlib and Power BI.}
+          \resumeItemListEnd}
+
+        \resumeProjectHeading
+          {\textbf{USA Accidents Prediction (Python, SQL)}}{May 2023 - Jul 2023}
+          \resumeItemListStart
+            \resumeItem{Developed a linear regression model in Python to predict accidents in the USA, using SQL for efficient data preparation and integration.}
+          \resumeItemListEnd}
+
+        \resumeProjectHeading
+          {\textbf{Layoffs Detection (R)}}{May 2023 - Jul 2023}
+          \resumeItemListStart
+            \resumeItem{Built a real-time detection system using R to analyze workforce trends and predict layoffs based on key indicators.}
+            \resumeItem{Evaluated the model's performance using metrics such as R-squared, Mean Absolute Error (MAE), and Root Mean Squared Error (RMSE), and fine-tuned the model to achieve optimal results.}
+          \resumeItemListEnd}
+
+        \resumeProjectHeading
+          {\textbf{House Price Prediction (Python, Machine Learning)}}{Jan 2019 - Mar 2019}
+          \resumeItemListStart
+            \resumeItem{Built a house price prediction model using Python and machine learning algorithms (Linear Regression, Decision Trees, Random Forest), improving pricing accuracy.}
+            
+          \resumeItemListEnd}
+
+        \resumeProjectHeading
+          {\textbf{Brain Tumor Detection (Clustering)}}{Jan 2018 - Mar 2018}
+          \resumeItemListStart
+            \resumeItem{Applied k-means clustering to segment and detect brain tumors from medical imaging data, improving diagnosis efficiency.}
+            \resumeItem{Utilized image processing techniques such as thresholding and edge detection to enhance tumor visibility in medical images, contributing to better segmentation results.}
+           \resumeItem{Preprocessed MRI scan images using techniques like noise reduction, normalization, and resizing to ensure consistent input data quality for clustering algorithms.}
+          \resumeItemListEnd}
+
+     \resumeSubHeadingListEnd
+
+
+
+%
+%-----------PROGRAMMING SKILLS-----------
+\vspace{-8pt}
+\section{Technical Skills}
+ \begin{itemize}
+ [leftmargin=0.05in, label={}, itemsep=-0.5ex] % Reduced item separation
+ \addtolength\itemsep{-4mm}
+    \small{\item{
+     \textbf{Languages: }{Python (Proficient), SQL (Proficient), R, C, C++} \\
+     \textbf{Python Libraries: }{scikit-learn, Pandas, NumPy, Matplotlib} \\
+     \textbf{ML/Data Skills: }{Regression, Clustering, Statistical Modeling, Data Mining, Model Validation/Development, NLP, EDA} \\
+     \textbf{Data Visualization: }{Tableau, Power BI, Matplotlib, Excel} \\
+     \textbf{Databases/Platforms: }{MySQL, PostgreSQL, Cloud Architectures} \\ % Added Cloud
+
+    }}
+ \end{itemize}
+
+
+%-----------AWARDS-----------
+\vspace{-12pt}
+\section{Awards \& Certifications}
+  \resumeSubHeadingListStart
+    \resumeItem{\textbf{Deep Learning (Coursera)}}{Completed a comprehensive course on Deep Learning, covering neural networks, convolutional networks (CNN), recurrent neural networks (RNN), and practical implementation of deep learning algorithms using TensorFlow and Keras.}
+    \resumeItem{\textbf{Data Science in Python (Besant Technologies)}}{Completed a Data Science course focused on Python, including data manipulation using Pandas, data visualization with Matplotlib and Seaborn, machine learning algorithms with scikit-learn, and practical problem-solving using Python in data analytics.}
+    \resumeItem{\textbf{AI and Technology in Poster Presentation (1st Prize, School Level)}}{Awarded 1st prize for designing and presenting a project on AI applications, demonstrating proficiency in AI concepts and effectively communicating technological advancements through a poster presentation.}
+    \resumeItem{\textbf{Recognized for Python/ML Performance}}{Acknowledged for excellence in Python programming and Machine Learning, solving complex analytical problems and applying concepts to real-world datasets.}
+    \resumeItem{\textbf{Top Prize in Science Exhibition for Tsunami Predicting Tool (District Level, School Level)}}{Won the top prize at the district level for developing an innovative tsunami prediction tool, demonstrating the potential of early data analysis and predictive algorithms in disaster management.}
+  \resumeSubHeadingListEnd
+  \resumeSubHeadingListEnd
+
+
+ \end{itemize}
+
+
+%-------------------------------------------
+\end{document}
+2. Upload Instructions PDF
+Upload PDF report with improvement suggestions:
+
+Match Report - Jobscan.pdf
+Drag and drop file here
+Limit 200MB per file • PDF
+Match Report - Jobscan.pdf
+246.1KB
+
+✨ Generated Improved LaTeX Code ✨
+Generating improved LaTeX code with Gemini 2.5 Pro... This might take a moment.
+
+�� View Generated LaTeX Code
+
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-0.7in}  % Increased top margin adjustment
+\addtolength{\textheight}{1.2in} % Increased text height adjustment
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[3]{
+  \vspace{-1pt} % Reduced vertical space before subheadings
+  \item
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} \small{#2} & #3 \\
+    \end{tabular*}\vspace{-5pt} % Reduced vertical space after subheadings
+}
+
+\newcommand{\resumeSubSubheadingExp}[2]{
+  \vspace{-8pt} % Reduced vertical space
+  \item
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \small{#2} \\
+    \end{tabular*}\vspace{-2pt} % Reduced vertical space
+}
+
+% Newly added for EDUCATION
+\newcommand{\educationHeading}[4]{
+  \vspace{-1pt}\item %Reduced vertical space
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-5pt} %Reduced vertical space
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{1.0\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-5pt} % Reduced vertical space
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.00in, label={}, itemsep=-0.5ex]} % Reduced item separation
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize} [leftmargin=0.1in, itemsep=-0.5ex]} % Reduced item separation
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-4pt}} % Reduced vertical space
+
+% Adjusting Margins
+\usepackage{geometry}
+\geometry{left=0.45in, right=0.45in, top=0.4in, bottom=0.4in}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\begin{center}
+    \textbf{\Large \scshape Jenifer Seciliya} \\ \vspace{1pt}
+    \small Data Analyst $|$ New York, USA \\
+    % Gemini: LinkedIn URL was already present, confirmed formatting. No change needed per PDF p.4.
+    \small +1 484-681-3442 $|$ \href{mailto:ceciliajenifer@gmail.com}{\underline{ceciliajenifer@gmail.com}} $|$ \href{https://www.linkedin.com/in/jenifercecilia0808/} {\underline{Linkedin}}
+\end{center}
+\vspace{-18pt} %Reduced
+%------Summary of Qualification ------
+
+\section{Summary}
+% Gemini: Shortened summary paragraph to reduce word count (~108 to ~69 words) and address "paragraphs longer than 40 words" feedback (PDF p. 5).
+Data Analyst/Scientist skilled in Python, SQL, machine learning, and data visualization (Tableau, Power BI) to drive business decisions. Proficient in analyzing complex datasets, building predictive models, data cleaning, and transformation. Proven ability to uncover patterns, generate accurate predictions, and present findings clearly. Experienced in optimizing processes and solving problems through data-driven insights. Eager to contribute to impactful data science and analytics projects.
+\vspace{-5pt}
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \educationHeading % Gemini: Minor shortening of location name
+      {Harrisburg University of Science and Technology}{Mar 2023 - Feb 2025}
+      {Masters of Science in Data Science} {GPA: 3.76/4.0}
+       \vspace{2pt}
+      \resumeItemListStart
+        \resumeItem{\textbf{Relevant Coursework:} Advanced Programming (Python), Exploratory Data Analysis, NLP, Machine Learning, Digital Marketing Analytics, Research Methodology.}
+      \resumeItemListEnd}
+    \vspace{4pt} % Add space here
+
+    \educationHeading % Gemini: Minor shortening of location name
+      {St. Xavier’s Catholic College of Engineering}{Aug 2014 - May 2018}
+      {Bachelor of Engineering, Computer Science}{}
+  \resumeSubHeadingListEnd
+
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+    \vspace{4pt}
+
+   \resumeSubheading
+      {Verizon-Best Wireless}{}{New York, USA}
+      \resumeSubSubheadingExp
+     {Data Analyst}{Mar 2024 - Present} % Gemini: Changed end date to Present
+      \resumeItemListStart
+        % Gemini: Shortened bullet points for conciseness and word count reduction (PDF p. 4).
+        \resumeItem{Analyzed sales and chargeback data for actionable insights, improving business performance.}
+        \resumeItem{Developed interactive Power BI dashboards and automated reports for real-time tracking of key sales metrics.}
+        \resumeItem{Authored complex SQL queries for extracting and cleaning large datasets, ensuring reporting accuracy.}
+        % Gemini: Added quantifiable result based on PDF feedback (p. 4, Measurable Results). Now 5+ results.
+        \resumeItem{Streamlined data extraction using complex SQL queries, reducing data processing time by 15\%.}
+        \resumeItem{Utilized Python (Pandas, Matplotlib, Seaborn) to visualize trends and present findings to stakeholders.}
+        \resumeItem{Reduced operational inefficiencies by 10\% through identifying chargeback trends and improving dispute resolution.}
+        \resumeItem{Collaborated with finance/operations to refine reporting processes and enhance decision-making.}
+        \resumeItem{Performed data integrity checks, minimizing errors and increasing trust in analytics.}
+    \resumeItemListEnd
+   \vspace{4pt}
+
+    \resumeSubheading
+      {Convergence}{}{Hyderabad, India}
+      \resumeSubSubheadingExp
+     {Data Analyst}{Aug 2021 - Dec 2022}
+      \resumeItemListStart
+        % Gemini: Shortened bullet points for conciseness and word count reduction (PDF p. 4).
+        \resumeItem{Created interactive Tableau/Power BI visualizations and dashboards from diverse data sources (SQL, Excel, CSV) for actionable financial insights.}
+        \resumeItem{Executed data cleaning, standardization, and segmentation using SQL to enhance data quality for analysis.}
+        \resumeItem{Automated recurring financial reports, improving efficiency by \textbf{30\%}.}
+        \resumeItem{Identified financial trends and anomalies to optimize revenue and cost-saving strategies.}
+        \resumeItem{Collaborated with finance teams to enhance \textbf{forecasting models}, improving budget accuracy.}
+    \resumeItemListEnd
+    \vspace{4pt}
+
+     \resumeSubheading
+      {Pantech Solution}{}{Remote, India} % Gemini: Corrected typo
+      \resumeSubSubheadingExp{Artificial Intelligence Engineer Intern}{May 2021 - Jul 2021}
+      \resumeItemListStart
+         % Gemini: Shortened bullet points for conciseness and word count reduction (PDF p. 4).
+         \resumeItem{Developed computer vision models (face/object detection, mask detection) using Python, OpenCV, TensorFlow, PyTorch.}
+         \resumeItem{Applied image preprocessing, feature extraction, and data augmentation to enhance model accuracy.}
+         \resumeItem{Used SQL for data extraction/manipulation, integrating CV insights into BI reports.}
+         \resumeItem{Improved model performance via hyperparameter tuning and optimizing architectures (ResNet, YOLO).}
+    \resumeItemListEnd}
+     \vspace{4pt}
+
+      \resumeSubheading
+      {Flux Auto}{}{Bangalore, India}
+      \resumeProjectHeading {\textbf{Data Scientist} \textbf{}}{Sep 2019 -  Apr 2020}
+        \resumeItemListStart
+            % Gemini: Shortened bullet points for conciseness and word count reduction (PDF p. 4). Made first point more active.
+            \resumeItem{Led data annotation and quality control for computer vision projects, ensuring accurate training data.}
+            \resumeItem{Improved object detection/segmentation accuracy by 30\% using Python, TensorFlow, PyTorch, OpenCV.}
+            \resumeItem{Developed deep learning systems (YOLO, Faster R-CNN) for autonomous vehicles.}
+            \resumeItem{Enhanced model performance through data preprocessing, augmentation, and feature engineering.}
+            \resumeItem{Led intern team in developing/deploying object detection models for autonomous driving, ensuring project timelines and model performance.}
+           \resumeItemListEnd}
+           \vspace{1.5pt}
+
+
+  \resumeSubHeadingListEnd
+
+
+%-----------PROJECTS-----------
+\vspace{-8pt}
+\section{Projects}
+    \resumeSubHeadingListStart
+       \resumeProjectHeading
+          {\textbf{Social Media and Mental Health Analysis (EDA, Python, SQL)}}{Oct 2024 - Feb 2025}
+          \resumeItemListStart
+            % Gemini: Shortened bullet points slightly for word count (PDF p. 4).
+             \resumeItem{Conducted EDA and built Python predictive models analyzing social media's impact on mental health.}
+             \resumeItem{Used ML algorithms (Random Forest, SVM) to assess links between social media usage and mental well-being.}
+             \resumeItem{Visualized findings on social media's mental health impact using Matplotlib and Power BI.}
+          \resumeItemListEnd}
+
+        \resumeProjectHeading
+          {\textbf{USA Accidents Prediction (Python, SQL)}}{May 2023 - Jul 2023}
+          \resumeItemListStart
+            % Gemini: Shortened bullet point for word count (PDF p. 4).
+            \resumeItem{Built Python linear regression model predicting USA accidents, using SQL for data preparation.}
+          \resumeItemListEnd}
+
+        \resumeProjectHeading
+          {\textbf{Layoffs Detection (R)}}{May 2023 - Jul 2023}
+          \resumeItemListStart
+            % Gemini: Shortened bullet points for word count (PDF p. 4).
+            \resumeItem{Developed R-based system analyzing workforce trends to predict layoffs.}
+            \resumeItem{Evaluated model performance (R-squared, MAE, RMSE) and fine-tuned for optimal results.}
+          \resumeItemListEnd}
+
+        \resumeProjectHeading
+          {\textbf{House Price Prediction (Python, Machine Learning)}}{Jan 2019 - Mar 2019}
+          \resumeItemListStart
+            % Gemini: Shortened bullet point for word count (PDF p. 4).
+            \resumeItem{Developed Python ML models (Linear Regression, Random Forest) for house price prediction, improving accuracy.}
+          \resumeItemListEnd}
+
+        \resumeProjectHeading
+          {\textbf{Brain Tumor Detection (Clustering)}}{Jan 2018 - Mar 2018}
+          \resumeItemListStart
+            % Gemini: Shortened bullet points for word count (PDF p. 4).
+            \resumeItem{Applied k-means clustering for brain tumor segmentation from medical images, improving diagnosis efficiency.}
+            \resumeItem{Used image processing (thresholding, edge detection) to enhance tumor visibility for segmentation.}
+            \resumeItem{Preprocessed MRI scans (noise reduction, normalization) for consistent clustering input.}
+          \resumeItemListEnd}
+
+     \resumeSubHeadingListEnd
+
+
+
+%
+%-----------PROGRAMMING SKILLS-----------
+\vspace{-8pt}
+\section{Technical Skills}
+ \begin{itemize}
+ [leftmargin=0.05in, label={}, itemsep=-0.5ex] % Reduced item separation
+ \addtolength\itemsep{-4mm}
+    \small{\item{
+     \textbf{Languages: }{Python (Proficient), SQL (Proficient), R, C, C++} \\
+     \textbf{Python Libraries: }{scikit-learn, Pandas, NumPy, Matplotlib, Seaborn, TensorFlow, PyTorch, OpenCV} \\ % Gemini: Added more mentioned libraries
+     \textbf{ML/Data Skills: }{Regression, Clustering, Statistical Modeling, Data Mining, Model Validation/Development, NLP, EDA, Computer Vision} \\ % Gemini: Added Computer Vision explicitly
+     \textbf{Data Visualization: }{Tableau, Power BI, Matplotlib, Excel} \\
+     \textbf{Databases/Platforms: }{MySQL, PostgreSQL, Cloud Architectures} \\
+
+    }}
+ \end{itemize}
+
+
+%-----------AWARDS-----------
+\vspace{-12pt}
+\section{Awards \& Certifications}
+  \resumeSubHeadingListStart
+    % Gemini: Shortened descriptions for conciseness and word count reduction (PDF p. 4).
+    \resumeItem{\textbf{Deep Learning (Coursera):}}{ Covered NNs, CNNs, RNNs; implemented models using TensorFlow/Keras.}
+    \resumeItem{\textbf{Data Science in Python (Besant Technologies):}}{ Focused on Pandas, Matplotlib/Seaborn, scikit-learn for data analysis.}
+    \resumeItem{\textbf{AI and Technology Poster Presentation (1st Prize, School):}}{ Awarded for project design and presentation on AI applications.}
+    \resumeItem{\textbf{Recognized for Python/ML Performance:}}{ Acknowledged for solving complex analytical problems.}
+    \resumeItem{\textbf{Tsunami Predicting Tool (Top Prize, District/School):}}{ Awarded for developing innovative prediction tool using data analysis.}
+  \resumeSubHeadingListEnd % Gemini: Removed duplicate \resumeSubHeadingListEnd and stray \end{itemize}
+
+
+%-------------------------------------------
+\end{document}
+

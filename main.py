@@ -6,6 +6,8 @@ import time
 import tempfile
 import subprocess
 import shutil
+# Import Google API exceptions
+from google.api_core import exceptions as google_exceptions
 
 # Initialize session state variables
 if 'improved_tex_code' not in st.session_state:
@@ -14,6 +16,13 @@ if 'pdf_bytes' not in st.session_state:
     st.session_state.pdf_bytes = None
 if 'retry_count' not in st.session_state:
     st.session_state.retry_count = 0
+# New session state variables for API key management
+if 'api_key' not in st.session_state:
+    st.session_state.api_key = None
+if 'api_source' not in st.session_state: # 'env', 'user', None
+    st.session_state.api_source = None
+if 'show_api_input' not in st.session_state:
+    st.session_state.show_api_input = False
 
 # --- Configuration ---
 st.set_page_config(page_title="Resume Improver with Gemini", layout="wide")
@@ -23,15 +32,49 @@ Paste your **current resume's LaTeX (.tex) code** below and upload a **PDF repor
 Gemini 2.5 Pro will analyze both and generate an improved LaTeX version.
 """)
 
-# --- API Key Input ---
-api_key = st.text_input("Enter your Google AI API Key:", type="password")
+# --- Load Default Resume Content ---
+default_resume_content = ""
+try:
+    with open("default_resume.txt", "r") as f:
+        default_resume_content = f.read()
+except FileNotFoundError:
+    st.warning("⚠️ default_resume.txt not found. Unable to load default content.")
+
+# --- API Key Handling ---
+# Try environment variable first
+env_api_key = os.getenv("GOOGLE_API_KEY")
+
+# Determine initial API key state only once or if reset
+if st.session_state.api_source is None:
+    if env_api_key:
+        st.session_state.api_key = env_api_key
+        st.session_state.api_source = 'env'
+        st.session_state.show_api_input = False
+        st.info("🔑 Using API key from environment variable.", icon="🔒")
+    else:
+        st.session_state.show_api_input = True # No env key, need user input
+
+# Display API key input field if needed
+user_entered_key = None
+if st.session_state.show_api_input:
+    user_entered_key = st.text_input("Enter your Google AI API Key:", type="password", key="api_key_input")
+    if user_entered_key:
+        # If user provides a key, use it and update state
+        st.session_state.api_key = user_entered_key
+        st.session_state.api_source = 'user'
 
 # --- Input Fields ---
 col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("1. Paste Current Resume LaTeX Code")
-    current_tex_code = st.text_area("Enter .tex code here:", height=400, key="tex_input")
+    # Use the loaded content as the default value
+    current_tex_code = st.text_area(
+        "Enter .tex code here:",
+        value=default_resume_content, # Set default value here
+        height=400,
+        key="tex_input"
+    )
 
 with col2:
     st.subheader("2. Upload Instructions PDF")
@@ -72,8 +115,9 @@ if st.session_state.improved_tex_code:
 
 # --- Logic ---
 if submit_button:
-    if not api_key:
-        st.warning("Please enter your Google AI API Key.")
+    # Check if we have a valid API key to use
+    if not st.session_state.api_key:
+        st.warning("Please provide a Google AI API Key.")
         st.stop()
     if not current_tex_code:
         st.warning("Please paste your current resume's LaTeX code.")
@@ -82,44 +126,55 @@ if submit_button:
         st.warning("Please upload the PDF instructions file.")
         st.stop()
 
-    # Reset retry count when starting new generation
-    st.session_state.retry_count = 0
+    # Reset retry count for the main generation process
+    st.session_state.retry_count = 0 # Reset for initial generation
 
     # --- Initialize variables for cleanup ---
     temp_pdf_path = None
     uploaded_gemini_file = None
     temp_dir = None
 
-    while st.session_state.retry_count < 3:  # Maximum 3 retries
+    # Flag to check if API key needs verification/change
+    api_key_valid = True
+
+    while st.session_state.retry_count < 3:  # Maximum 3 retries for LaTeX compilation
         try:
             # --- Configure Gemini ---
-            genai.configure(api_key=api_key)
+            # Configure with the key we have (either env or user)
+            genai.configure(api_key=st.session_state.api_key)
 
             # --- Save Uploaded PDF to a Temporary File ---
-            output_area.info("Preparing PDF for upload...")
-            pdf_bytes = uploaded_pdf.getvalue()
+            # Check if PDF needs uploading (only first time or if changed)
+            # This part needs careful handling if uploaded_pdf can change between retries
+            # Assuming it doesn't change within the retry loop for now.
+            if st.session_state.retry_count == 0: # Only upload on first attempt
+                output_area.info("Preparing PDF for upload...")
+                pdf_bytes_val = uploaded_pdf.getvalue() # Use a different variable name
 
-            # Create a temporary file to store the PDF bytes
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_f:
-                temp_f.write(pdf_bytes)
-                temp_pdf_path = temp_f.name # Get the path to the temporary file
+                # Create a temporary file to store the PDF bytes
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_f:
+                    temp_f.write(pdf_bytes_val)
+                    temp_pdf_path = temp_f.name # Get the path to the temporary file
 
-            # --- Upload PDF to Gemini using the temporary file path ---
-            if temp_pdf_path:
-                output_area.info(f"Uploading '{uploaded_pdf.name}' from temporary path...")
-                uploaded_gemini_file = genai.upload_file(
-                    path=temp_pdf_path, # Pass the file PATH here
-                    display_name=uploaded_pdf.name,
-                    mime_type='application/pdf'
-                )
-                output_area.info(f"✅ PDF '{uploaded_pdf.name}' uploaded successfully to Gemini.")
-                st.toast("PDF Uploaded!", icon="📄")
-            else:
-                st.error("❌ Failed to create a temporary file for the PDF.")
-                st.stop()
+                # --- Upload PDF to Gemini using the temporary file path ---
+                if temp_pdf_path:
+                    output_area.info(f"Uploading '{uploaded_pdf.name}' from temporary path...")
+                    # Test API connection early with a simple call if possible,
+                    # otherwise, the first generate_content call will test it.
+                    # For now, we proceed to upload.
+                    uploaded_gemini_file = genai.upload_file(
+                        path=temp_pdf_path, # Pass the file PATH here
+                        display_name=uploaded_pdf.name,
+                        mime_type='application/pdf'
+                    )
+                    output_area.info(f"✅ PDF '{uploaded_pdf.name}' uploaded successfully to Gemini.")
+                    st.toast("PDF Uploaded!", icon="📄")
+                else:
+                    st.error("❌ Failed to create a temporary file for the PDF.")
+                    st.stop() # Stop if PDF upload fails critically
 
             # --- Prepare for Gemini API Call ---
-            model = genai.GenerativeModel('gemini-2.5-pro-exp-03-25')
+            model = genai.GenerativeModel('gemini-2.5-pro-exp-03-25') # Consider making model instantiation outside loop if safe
 
             # --- Construct the Prompt ---
             prompt_parts = [
@@ -150,12 +205,12 @@ if submit_button:
                     "\nPlease fix the LaTeX code to address these compilation errors.",
                 ])
 
-            output_area.info("Generating improved LaTeX code with Gemini 2.5 Pro... This might take a moment.")
+            output_area.info(f"Attempt {st.session_state.retry_count + 1}: Generating improved LaTeX code...")
             with st.spinner("🧠 Gemini is thinking..."):
                 # --- Call Gemini API ---
                 response = model.generate_content(prompt_parts, stream=False)
 
-            # --- Display Output ---
+            # --- Process Response ---
             if response and response.text:
                 improved_tex_code = response.text
                 # Clean potential markdown code block formatting
@@ -208,8 +263,9 @@ if submit_button:
                         )
                         st.success("✅ PDF generated successfully!")
                         
-                        # Break the retry loop on success
-                        break
+                        # Break the retry loop on successful LaTeX compilation
+                        api_key_valid = True # Key worked for this generation
+                        break # Exit the while loop for retries
                     else:
                         # Store error information for retry
                         error_msg = "LaTeX Compilation Errors:\n"
@@ -239,43 +295,77 @@ if submit_button:
                     st.error(f"❌ Error generating PDF: {e}")
                     break
 
-            else:
-                # Check for safety ratings or other issues if text is empty
-                try:
-                     output_area.error(f"❌ Gemini did not return text content. Finish reason: {response.prompt_feedback}")
-                except Exception:
-                     output_area.error("❌ Gemini did not return text content. Response or text attribute might be missing.")
-                break
+            # --- Handle potential empty response from Gemini ---
+            elif not response or not response.text:
+                 # Check for safety ratings or other issues if text is empty
+                 try:
+                      # Log feedback if available
+                      feedback_info = f"Finish reason: {response.prompt_feedback}" if response else "No response object."
+                      output_area.error(f"❌ Gemini did not return text content. {feedback_info}")
+                 except Exception as feedback_err:
+                      output_area.error(f"❌ Gemini did not return text content. Error accessing feedback: {feedback_err}")
+                 api_key_valid = False # Treat no response as potential key issue too
+                 break # Exit retry loop if Gemini gives no content
 
+        # --- Handle API specific errors ---
+        except (google_exceptions.PermissionDenied, google_exceptions.ResourceExhausted) as api_error:
+            st.error(f"API Error: {api_error}")
+            api_key_valid = False # Mark key as invalid
+            if st.session_state.api_source == 'env':
+                st.warning("⚠️ The default API key failed (Permission Denied or Rate Limit Exceeded). Please enter your own key below.")
+                st.session_state.show_api_input = True
+                st.session_state.api_key = None # Clear the invalid env key
+                st.session_state.api_source = None # Reset source
+                st.experimental_rerun() # Rerun to show input and stop current execution
+            else: # Error occurred with user-provided key
+                st.error("❌ Your provided API key failed. Please check it and try again.")
+                # Optionally clear the key input or leave it for user correction
+                st.session_state.api_key = None # Clear the invalid user key
+                st.session_state.api_source = None
+                st.session_state.show_api_input = True # Make sure input is shown
+                st.experimental_rerun() # Rerun to ensure UI updates
+            break # Exit retry loop on API error
+
+        # --- Handle other general exceptions ---
         except Exception as e:
-            st.error(f"An error occurred: {e}")
-            output_area.error(f"❌ Failed to generate response. Error: {e}")
-            break
+            st.error(f"An unexpected error occurred: {e}")
+            output_area.error(f"❌ Failed during generation. Error: {e}")
+            api_key_valid = False # Unsure about key validity, but stop
+            break # Exit retry loop on general error
 
         finally:
-            # --- Clean up the LOCAL temporary file ---
+            # --- Clean up ---
+            # Clean up local temp PDF regardless of success/failure inside the loop
             if temp_pdf_path and os.path.exists(temp_pdf_path):
                 try:
                     os.remove(temp_pdf_path)
+                    temp_pdf_path = None # Reset path after deletion
                 except Exception as e:
-                    st.warning(f"⚠️ Could not delete the local temporary file '{temp_pdf_path}': {e}")
+                    st.warning(f"⚠️ Could not delete the local temporary file: {e}")
 
-            # --- Clean up the file uploaded to GEMINI ---
-            if uploaded_gemini_file:
-                try:
-                    st.info(f"Cleaning up file '{uploaded_gemini_file.display_name}' on Gemini...")
-                    genai.delete_file(uploaded_gemini_file.name)
-                    st.info("✅ Gemini file cleanup complete.")
-                    st.toast("Gemini file cleanup done.", icon="🗑️")
-                except Exception as cleanup_err:
-                    st.warning(f"⚠️ Could not delete the file from Gemini: {cleanup_err}")
+            # Clean up Gemini file only if generation was attempted and failed,
+            # or after successful completion outside the loop.
+            # Deleting it here might cause issues on retry if needed.
+            # Let's move Gemini file cleanup outside the loop.
 
-            # --- Clean up temporary directory ---
+            # Clean up LaTeX temp dir if it exists
             if temp_dir and os.path.exists(temp_dir):
                 try:
                     shutil.rmtree(temp_dir)
+                    temp_dir = None # Reset path
                 except Exception as e:
-                    st.warning(f"⚠️ Could not delete temporary directory '{temp_dir}': {e}")
+                    st.warning(f"⚠️ Could not delete temporary LaTeX directory: {e}")
+
+    # --- After the retry loop ---
+    # Clean up the file uploaded to GEMINI only after the loop finishes (success or max retries)
+    if uploaded_gemini_file:
+        try:
+            st.info(f"Cleaning up file '{uploaded_gemini_file.display_name}' on Gemini...")
+            genai.delete_file(uploaded_gemini_file.name)
+            st.info("✅ Gemini file cleanup complete.")
+            st.toast("Gemini file cleanup done.", icon="🗑️")
+        except Exception as cleanup_err:
+            st.warning(f"⚠️ Could not delete the file from Gemini: {cleanup_err}")
 
 # --- Footer/Info ---
 st.markdown("---")
