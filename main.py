@@ -45,6 +45,15 @@ submit_button = st.button("🚀 Generate Improved Resume LaTeX")
 st.subheader("✨ Generated Improved LaTeX Code ✨")
 output_area = st.empty() # Placeholder for the output
 
+# Clear previous output when generate button is clicked
+if submit_button:
+    # Clear session state
+    st.session_state.improved_tex_code = None
+    st.session_state.pdf_bytes = None
+    st.session_state.retry_count = 0
+    # Clear output area
+    output_area.empty()
+
 # Display stored LaTeX code if it exists
 if st.session_state.improved_tex_code:
     with st.expander("📝 View Generated LaTeX Code", expanded=False):
