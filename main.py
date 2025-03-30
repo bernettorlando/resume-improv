@@ -35,7 +35,7 @@ if 'request_summary' not in st.session_state: # Track checkbox state
 st.set_page_config(page_title="Resume Improver with Gemini", layout="wide")
 st.title("📄✨ Resume Improver using Gemini 2.5 Pro")
 st.markdown("""
-Paste your **current resume's LaTeX (.tex) code** below and upload a **PDF report** containing instructions or feedback for improvement.
+Paste your **current resume's LaTeX (.tex) code** below. Optionally upload a **PDF report** with improvement suggestions or provide a job description.
 Gemini 2.5 Pro will analyze both and generate an improved LaTeX version.
 """)
 
@@ -84,10 +84,10 @@ with col1:
     )
 
 with col2:
-    st.subheader("2. Upload Instructions PDF")
-    uploaded_pdf = st.file_uploader("Upload PDF report with improvement suggestions:", type="pdf", key="pdf_upload")
+    st.subheader("2. (Optional) Upload Instructions PDF")
+    uploaded_pdf = st.file_uploader("Upload PDF report with improvement suggestions (optional):", type="pdf", key="pdf_upload")
 
-    st.subheader("3. (Optional) Paste Job Description")
+    st.subheader("3. Paste Job Description")
     job_description = st.text_area(
         "Paste the target job description here for tailored improvements:",
         height=200,
@@ -171,8 +171,8 @@ if submit_button:
     if not current_tex_code:
         st.warning("Please paste your current resume's LaTeX code.")
         st.stop()
-    if not uploaded_pdf:
-        st.warning("Please upload the PDF instructions file.")
+    if not job_description:
+        st.warning("Please provide a job description for tailored improvements.")
         st.stop()
 
     # Reset retry count for the main generation process
@@ -196,26 +196,21 @@ if submit_button:
             genai.configure(api_key=st.session_state.api_key)
 
             # --- Save Uploaded PDF to a Temporary File ---
-            # Check if PDF needs uploading (only first time or if changed)
-            # This part needs careful handling if uploaded_pdf can change between retries
-            # Assuming it doesn't change within the retry loop for now.
-            if st.session_state.retry_count == 0: # Only upload on first attempt
+            # Only process PDF if it was uploaded
+            if uploaded_pdf and st.session_state.retry_count == 0: # Only upload on first attempt
                 output_area.info("Preparing PDF for upload...")
-                pdf_bytes_val = uploaded_pdf.getvalue() # Use a different variable name
+                pdf_bytes_val = uploaded_pdf.getvalue()
 
                 # Create a temporary file to store the PDF bytes
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_f:
                     temp_f.write(pdf_bytes_val)
-                    temp_pdf_path = temp_f.name # Get the path to the temporary file
+                    temp_pdf_path = temp_f.name
 
                 # --- Upload PDF to Gemini using the temporary file path ---
                 if temp_pdf_path:
                     output_area.info(f"Uploading '{uploaded_pdf.name}' from temporary path...")
-                    # Test API connection early with a simple call if possible,
-                    # otherwise, the first generate_content call will test it.
-                    # For now, we proceed to upload.
                     uploaded_gemini_file = genai.upload_file(
-                        path=temp_pdf_path, # Pass the file PATH here
+                        path=temp_pdf_path,
                         display_name=uploaded_pdf.name,
                         mime_type='application/pdf'
                     )
@@ -223,37 +218,64 @@ if submit_button:
                     st.toast("PDF Uploaded!", icon="📄")
                 else:
                     st.error("❌ Failed to create a temporary file for the PDF.")
-                    st.stop() # Stop if PDF upload fails critically
+                    st.stop()
 
             # --- Prepare for Gemini API Call ---
             model = genai.GenerativeModel('gemini-2.5-pro-exp-03-25')
 
             # --- Construct the Prompt --- (Conditionally add summary instructions)
-            prompt_parts = [
-                "You are an expert LaTeX resume editor specializing in ATS-friendly resumes tailored for specific job descriptions.",
-                "You will be given the current LaTeX code for a resume, a PDF file with improvement feedback, and potentially a target job description.",
-                "\n**Task:** Analyze the instructions in the PDF and the requirements in the job description (if provided). Apply relevant improvements to the given LaTeX code to create an optimized, ATS-friendly version tailored for the target role.",
-                "\n**Input Resume LaTeX Code:**\n```latex\n",
-                current_tex_code,
-                "\n```\n",
-                "\n**Input Instructions PDF:**\n",
-                uploaded_gemini_file,
-            ]
-
-            # Conditionally add Job Description
-            if job_description:
-                prompt_parts.extend([
+            if uploaded_pdf:
+                # Use PDF-based prompt
+                prompt_parts = [
+                    "You are an expert LaTeX resume editor specializing in ATS-friendly resumes tailored for specific job descriptions.",
+                    "You will be given the current LaTeX code for a resume, a PDF file with improvement feedback, and a target job description.",
+                    "\n**Task:** Analyze the instructions in the PDF and the requirements in the job description. Apply relevant improvements to the given LaTeX code to create an optimized, ATS-friendly version tailored for the target role.",
+                    "\n**Input Resume LaTeX Code:**\n```latex\n",
+                    current_tex_code,
+                    "\n```\n",
+                    "\n**Input Instructions PDF:**\n",
+                    uploaded_gemini_file,
+                ]
+            else:
+                # Use general instructions prompt
+                prompt_parts = [
+                    "You are an expert resume optimizer specializing in tailoring resumes to pass Applicant Tracking Systems (ATS) and appeal to recruiters.",
+                    "Your task is to revise the provided resume based on the job description. Follow these instructions precisely:",
+                    "\n**Input Resume LaTeX Code:**\n```latex\n",
+                    current_tex_code,
+                    "\n```\n",
                     "\n**Target Job Description:**\n```text\n",
                     job_description,
                     "\n```\n",
-                ])
+                    "\n**Instructions:**",
+                    "1. ATS Compliance & Searchability:",
+                    "- Ensure contact information is easily parsable (Name, Phone, Email, LinkedIn URL if available).",
+                    "- Find and incorporate the exact job title from the job description.",
+                    "- Include a concise summary/objective section highlighting relevant qualifications.",
+                    "- Verify presence of standard sections (Work Experience, Education) with clear headings.",
+                    "- Match education requirements if specified in the job description.",
+                    "- Use consistent date formatting (MM/YYYY or Month YYYY).",
+                    "2. Skills Integration:",
+                    "- Identify and incorporate hard skills from the job description using exact wording.",
+                    "- Weave soft skills naturally into work experience and summary.",
+                    "3. Content & Recruiter Appeal:",
+                    "- Include quantifiable achievements and results in bullet points.",
+                    "- Maintain professional, positive, and action-oriented language.",
+                    "- Keep content concise and under 1000 words for non-executive roles.",
+                    "- Ensure experience level matches job requirements.",
+                    "4. Formatting:",
+                    "- Avoid columns, tables, or images that can confuse ATS.",
+                    "- Keep bullet points and paragraphs concise (under 40 words).",
+                    "- Use standard, readable fonts.",
+                    "- Avoid information in headers/footers.",
+                ]
 
             # Define Output Requirements based on checkbox
             output_reqs = [
                 "\n**Output Requirements:**",
                 "- Output ONLY the complete, modified LaTeX code for the improved resume.",
                 "- Ensure the LaTeX output is valid and compilable.",
-                "- Incorporate feedback from the PDF and tailor content/keywords to the job description.",
+                "- Tailor content/keywords to the job description.",
                 "- Do NOT include any conversational text, explanations, or introductions/conclusions outside the LaTeX code itself.",
                 "- Use comments within LaTeX (e.g., `% Gemini: Applied suggestion X / Tailored for JD keyword Y`) if helpful.",
             ]
@@ -469,11 +491,6 @@ if submit_button:
                 except Exception as e:
                     st.warning(f"⚠️ Could not delete the local temporary file: {e}")
 
-            # Clean up Gemini file only if generation was attempted and failed,
-            # or after successful completion outside the loop.
-            # Deleting it here might cause issues on retry if needed.
-            # Let's move Gemini file cleanup outside the loop.
-
             # Clean up LaTeX temp dir if it exists
             if temp_dir and os.path.exists(temp_dir):
                 try:
@@ -483,7 +500,7 @@ if submit_button:
                     st.warning(f"⚠️ Could not delete temporary LaTeX directory: {e}")
 
     # --- After the retry loop ---
-    # Clean up the file uploaded to GEMINI only after the loop finishes (success or max retries)
+    # Clean up the file uploaded to GEMINI only if one was uploaded
     if uploaded_gemini_file:
         try:
             st.info(f"Cleaning up file '{uploaded_gemini_file.display_name}' on Gemini...")
